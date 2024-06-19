@@ -1,4 +1,4 @@
-import pygame
+import pygama
 from pygame import *
 import pygame_menu
 pygame.init()

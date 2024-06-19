@@ -1,5 +1,7 @@
+import pygame
 from pygame import *
-
+import pygame_menu
+pygame.init()
 width = 600
 height = 500
 window = display.set_mode((width, height))
@@ -42,28 +44,31 @@ class Player(GameSprite):
 
 clock = time.Clock()
 FPS = 60
-
+p1=0
+p2=0
 font.init()
 font1 = font.SysFont(None, 36)
-lose1 = font1.render('PLAYER 1 Проиграл((', True, (180, 0, 0))
-lose2 = font1.render('PLAYER 2 Проиграл((', True, (180, 0, 0))
-
 rackets1 = Player('racket.png', 30, 200, 6, 50, 150)
 rackets2 = Player('racket.png', 520, 200, 6, 50, 150)
 ball = GameSprite('tenis_ball.png', 200, 200, 4, 50, 50)
 
-ball_x = 4
-ball_y = 4
 
-finish = False
-game = True
+def main():
+    rackets1 = Player('racket.png', 30, 200, 6, 50, 150)
+    rackets2 = Player('racket.png', 520, 200, 6, 50, 150)
+    ball = GameSprite('tenis_ball.png', 200, 200, 4, 50, 50)
 
-while game:
-    for e in event.get():
-        if e.type == QUIT:
-            game = False
+    ball_x = 4
+    ball_y = 4
+    global p1,p2
+    while True:
+        p1_text_1=font1.render(f'Счёт:{p1}',True,(0,0,0))
+        p2_text_1=font1.render(f'Счёт:{p2}',True,(0,0,0))
+        for e in event.get():
+            if e.type == QUIT:
+                return
 
-    if finish != True:
+
         window.fill(back)
         rackets1.update_l()
         rackets2.update_r()
@@ -77,15 +82,38 @@ while game:
         if ball.rect.y < 0 or ball.rect.y > height - 50:
             ball_y *= -1
         if ball.rect.x < 0:
-            finish = True
-            window.blit(lose1, (200, 200))
+            p2+=1
+            show_end_screen()
         if ball.rect.x > width - 1:
-            finish = True
-            window.blit(lose2, (200, 200))
+            p1+=1
+            show_end_screen()
+
 
         rackets1.reset()
         rackets2.reset()
         ball.reset()
+        window.blit(p1_text_1,(10,10))
+        window.blit(p2_text_1,(500,10))
+        display.update()
+        clock.tick(FPS)
 
-    display.update()
-    clock.tick(FPS)
+def restart():
+    global p1,p2
+    p1,p2=0,0
+    main()
+
+def show_start_screen():
+    start_menu=pygame_menu.Menu('Ping Pong', 300,400,theme=pygame_menu.themes.THEME_ORANGE)
+    start_menu.add.button('Начать',main)
+    start_menu.add.button('Выйти',pygame_menu.events.EXIT)
+    start_menu.mainloop(window)
+
+def show_end_screen():
+    start_menu=pygame_menu.Menu('конец', 300,400,theme=pygame_menu.themes.THEME_ORANGE)
+    start_menu.add.button('Заново',restart)
+    start_menu.add.button('Реванш',main)
+    start_menu.add.button('Выйти',pygame_menu.events.EXIT)
+    start_menu.mainloop(window)
+
+if __name__=='__main__':
+    show_start_screen()
